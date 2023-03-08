@@ -62,7 +62,16 @@ void logCollection(char path[50]) {
 	
 	char cmdbuf[256];
 	// auth.log
-	snprintf(cmdbuf, sizeof(cmdbuf), "grep -v cron /var/log/auth.log | grep -v sudo | grep -i user > %s/logs/auth_log.txt", path);
+	snprintf(cmdbuf, sizeof(cmdbuf), "cat /var/log/auth.log > %s/logs/auth_log.txt", path);
+	system(cmdbuf);
+	// dpkg.log
+	snprintf(cmdbuf, sizeof(cmdbuf), "cat /var/log/dpkg.log > %s/logs/dpkg_log.txt", path);
+	system(cmdbuf);
+	// syslog
+	snprintf(cmdbuf, sizeof(cmdbuf), "cat /var/log/syslog > %s/logs/syslog.txt", path);
+	system(cmdbuf);
+	// Last Logins
+	snprintf(cmdbuf, sizeof(cmdbuf), "last > %s/logs/last.txt", path);
 	system(cmdbuf);
 	// Vim files
 	snprintf(cmdbuf, sizeof(cmdbuf), "cat $HOME/.viminfo > %s/logs/vim_log.txt", path);
