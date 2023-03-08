@@ -6,10 +6,7 @@ from datetime import datetime
 # Page config
 st.set_page_config(layout="wide")
 
-
-## START TEST
-
-# Open the dpkg.log file and read its contents
+# Open the last.txt file and read its contents
 with open(f'{st.session_state.path}/logs/last.txt', 'r') as f:
     contents = f.read()
 
@@ -34,8 +31,7 @@ for line in lines:
 
 users_df = pd.DataFrame(lastlog_data, columns=['date', "time", "event", "type"])
 
-## END TEST
-# Open the dpkg.log file and read its contents
+# Open the dpkg_log.txt file and read its contents
 with open(f'{st.session_state.path}/logs/dpkg_log.txt', 'r') as f:
     contents = f.read()
 
@@ -58,7 +54,7 @@ for line in lines:
 # Create a Pandas dataframe from the data
 dpkglog_df = pd.DataFrame(dpkg_data, columns=['date', "time", "event", "type"])
 
-# Open the auth.log file and read its contents
+# Open the auth_log.txt file and read its contents
 with open(f'{st.session_state.path}/logs/auth_log.txt', 'r') as f:
     contents = f.read()
 
@@ -85,10 +81,40 @@ for line in lines:
     type = "auth.log"
     auth_data.append([date, time, event, type])
 
+# Open the auth_log.txt file and read its contents
+with open(f'{st.session_state.path}/logs/syslog.txt', 'r') as f:
+    contents = f.read()
+
+# Split the contents into lines
+lines = contents.split('\n')
+
+# Create an empty list to store the data
+syslog_data = []
+
+time_regex = "[0-9]{2}:[0-9]{2}:[0-9]{2}"
+
+# Loop through the lines and extract the data
+for line in lines:
+    try:
+        date_obj = datetime.strptime(line[:6], "%b %d")
+        date = date_obj.strftime("2023-%m-%d")
+    except:
+        continue
+    try:
+        time = re.findall(time_regex, line)[0]
+    except:
+        continue
+    event = line[26:]
+    type = "syslog"
+    syslog_data.append([date, time, event, type])
+# Create a Pandas dataframe from the data
+syslog_df = pd.DataFrame(syslog_data, columns=['date', "time", "event", "type"])
+
 # Create a Pandas dataframe from the data
 authlog_df = pd.DataFrame(auth_data, columns=["date", "time", "event", "type"])
 total_df = authlog_df.append(dpkglog_df, ignore_index=True)
 total_df = total_df.append(users_df, ignore_index=True)
+total_df = total_df.append(syslog_df, ignore_index=True)
 
 # Chart placeholder element
 timeline_chart = st.empty()
