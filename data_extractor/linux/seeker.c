@@ -14,6 +14,10 @@ void iocCollection(char path[50]) {
 		system(cmdbuf);
 		snprintf(cmdbuf, sizeof(cmdbuf), "find %s -type f -executable -exec sh -c \"echo FILE:{} >> %s/files/ioc.txt && strings {} | grep -E \'rm|arp|users|netstat|uname|groups|tcpdump|LD_PRELOAD\\s\' >> %s/files/ioc.txt\" \\;", hashDirectories[i], path, path);
 		system(cmdbuf);
+		// strings for YARA rules
+		snprintf(cmdbuf, sizeof(cmdbuf), "find %s -type f -executable -exec sh -c \'strings \"$1\" > \"%s/files/${1##*/}.strings\"\' sh {} \\;", hashDirectories[i], path);
+		system(cmdbuf);
+
 	}
 	// Installed packages
 	snprintf(cmdbuf, sizeof(cmdbuf), "echo Installed: $(apt list --installed | wc -l) >> %s/system/packages.txt", path);
