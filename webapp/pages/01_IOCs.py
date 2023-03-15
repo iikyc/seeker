@@ -54,49 +54,45 @@ try:
             st.success("Analysis done")
 
     ##
-    # Pre-processed, possible IOC from executable files
+    # YARA
     if genre == "Executables":
         # Page setup
         st.subheader("Executables")
         # Columns
         col1, col2 = st.columns(2)
-
-        # Read IOC file
-        executables_file = open(f"{st.session_state.path}/files/ioc.txt")
-        files = executables_file.readlines()
-        # Print out IOC file
-        #for line in files:
-            #if line.startswith("FILE:"):
-                #st.info(line.replace("FILE:",""))
-            #else:
-                #st.write(line)
+        # Left column for user input and buttons
         with col1:
-            rule = st.text_area("YARA Rule")
-            run_yara = st.button("Run")
-        if run_yara:
+            rule_text_area = st.text_area("YARA Rule")
+            run_user_yara = st.button("Run Manual YARA Rule")
+            run_precompiled_yara = st.button("Run Precompiled YARA Rule")
+        ##
+        # Apply precompiled YARA rule
+        if run_precompiled_yara:
             with col2:
-                executables_file = open(f"{st.session_state.path}/files/ioc.txt")
-                lines = executables_file.readlines()
-                yara_regex = "^[^FILE].*"
-                for line in lines:
-                    #st.write(re.findall(line, yara_regex))
-                    pass
-                # string to be checked against YARA rule
-                string = "This is an example string."
-
-                # compile YARA rule
-                rules = yara.compile(source=rule)
-
-                # apply YARA rule to the string
-                matches = rules.match(data=string)
-
-                # check if the string matches the YARA rule
-                if len(matches) > 0:
-                    st.error("The string matches the YARA rule.")
-                else:
-                    st.success("The string does not match the YARA rule.")
-
-
+                try:
+                    rule = yara.compile(source='rule dummy { condition: true }')
+                    st.subheader("Matches")
+                    for file in os.listdir(f"{st.session_state.path}/files"):
+                        if file.endswith(".strings"):
+                            matches = rule.match(f"{st.session_state.path}/files/{file}")
+                            if (len(matches) > 0):
+                                st.error(file + " matches")
+                except:
+                    st.error("Unable to Compile YARA Rule")
+        ##
+        # Apply YARA rule from user input
+        if run_user_yara:
+            with col2:
+                try:
+                    rule = yara.compile(source=rule_text_area)
+                    st.subheader("Matches")
+                    for file in os.listdir(f"{st.session_state.path}/files"):
+                        if file.endswith(".strings"):
+                            matches = rule.match(f"{st.session_state.path}/files/{file}")
+                            if (len(matches) > 0):
+                                st.error(file + " matches")
+                except:
+                    st.error("Unable to Compile YARA Rule")
     ##
     # Installed packages
     if genre == "Packages":
