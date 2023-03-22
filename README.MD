@@ -1,3 +1,5 @@
+<img src="/assets/seeker-logo.png" alt="Seeker Logo">
+
 # Seeker
 ## _Linux Digital Forensics toolkit written in Python and C_
 
