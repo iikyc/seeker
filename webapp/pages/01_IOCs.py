@@ -70,13 +70,16 @@ try:
         if run_precompiled_yara:
             with col2:
                 try:
-                    rule = yara.compile(source='rule dummy { condition: true }')
                     st.subheader("Matches")
+                    rule = yara.compile('YARA_signatures/example.yara')
                     for file in os.listdir(f"{st.session_state.path}/files"):
                         if file.endswith(".strings"):
                             matches = rule.match(f"{st.session_state.path}/files/{file}")
                             if (len(matches) > 0):
-                                st.error(file + " matches")
+                                with st.expander(file):
+                                    st.error(matches)
+                                #st.error(matches)
+                                #st.error(file + " matches ")
                 except:
                     st.error("Unable to Compile YARA Rule")
         ##
