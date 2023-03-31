@@ -4,6 +4,7 @@ import re
 import yara
 import os
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 ##
@@ -44,9 +45,26 @@ try:
                         st.write(f"Hash: {re.search(hash_regexp, hash).group(0)}")
                         st.write(f"Reported as malicious: {file.last_analysis_stats['malicious']} times")
                         with st.expander("Details"):
-                            st.info("Aliases")
+                            st.subheader("Aliases")
                             for alias in file.names:
                                 st.write(alias)
+                            ## MITRE ATT&CK behavioural mapping
+                            vt_requests_url = f"https://www.virustotal.com/api/v3/files/{re.search(hash_regexp, hash).group(0)}/behaviour_mitre_trees"
+                            headers = {"accept": "application/json",
+                                       "x-apikey": os.getenv("VTKEY")
+                                       }
+                            response = requests.get(vt_requests_url, headers=headers)
+                            st.subheader("MITRE ATT&CK")
+                            for x in response.json()["data"]:
+                                for description in response.json()["data"][x]["tactics"]:
+                                    st.write(description["description"].split(".")[0])
+                                    st.write("Tactic: " + description["techniques"][0]["id"])
+                                    st.write("MITRE Link: " + description["techniques"][0]["link"])
+                                    st.info("Signature")
+                                    st.write(
+                                        "Severity: " + description["techniques"][0]["signatures"][0]["severity"])
+                                    st.write("Description: " + description["techniques"][0]["signatures"][0][
+                                        "description"])
                 except:
                     pass
                 client.close()
