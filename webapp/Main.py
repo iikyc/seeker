@@ -44,7 +44,7 @@ if st.session_state.path:
         st.write(f"Data collected as: {f.readline()}")
         st.write(f"Hostname: {f.readline()}")
         st.write(f"Timezone: {f.readline()}")
-        st.write(f"Uptime: ")
+        st.write(f"Uptime: {f.readline()}")
     # Print users
     with st.expander("Users"):
         option = st.selectbox('Shell',("All Users", 'Login', "No Login"))

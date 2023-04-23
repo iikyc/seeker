@@ -97,6 +97,9 @@ void systemCollection(char path[50]) {
 	// Timezone
 	snprintf(cmdbuf, sizeof(cmdbuf), "cat /etc/timezone >> %s/system/system_information.txt", path);
 	system(cmdbuf);
+	// Uptime
+	snprintf(cmdbuf, sizeof(cmdbuf), 'uptime | grep -oE "[0-9]{1,}\\sdays" >> system_information.txt', path);
+	system(cmdbuf);
 	// Users
 	snprintf(cmdbuf, sizeof(cmdbuf), "cat /etc/passwd > %s/system/users.txt", path);
 	system(cmdbuf);
